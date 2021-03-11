@@ -3,8 +3,8 @@ pipeline {
     parameters { 
        choice(name: 'REPO_LIST', choices: ['box1', 'box2'], description: 'list of names of repositories in github to be build and zipped for veracode scan')
     tools {
-        maven: "Maven",
-        gradle: "Gradle"
+        maven "Maven"
+        gradle "Gradle"
     }
     stages {
         stage ("build") {
