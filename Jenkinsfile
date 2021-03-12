@@ -15,16 +15,22 @@ pipeline {
     }
     stages {
         stage ("read CSV") {
-            steps{
-                echo "reading CSV file"
+            steps {
                 script {
+                    echo "reading CSV file"
                     repoList = readTrusted(params.REPO_LIST).readLines()
+                    buildStages = prepareBuildStages(repoList)
+                    println("Initialised pipeline.")
                 }
-                buildStages = prepareBuildStages(repoList)
-                println("Initialised pipeline.")
             }
         }
-        parallel(buildStages)
+        stage ("build microservices") {
+            steps {
+                script {
+                    buildStages.each{bs -> parallel(bs)} 
+                }
+            }
+        }
         stage ("scan") {
             steps {
                 echo "inside scan stage"
