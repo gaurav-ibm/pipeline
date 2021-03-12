@@ -1,5 +1,7 @@
 def repoList = 'undefined'
 def baseGitURL = 'https://github.com/gaurav-ibm/'
+def buildStages
+
 pipeline {
     agent any
     tools {
@@ -14,13 +16,13 @@ pipeline {
     stages {
         stage ("scan CSV") {
             steps{
-                echo "inside reading CSV stage"
+                echo "reading CSV file"
                 script {
                     repoList = readTrusted(params.REPO_LIST).readLines()
                 }
-                buildStages = prepareBuildStages(repoList)
-                println("Initialised pipeline.")
             }
+            buildStages = prepareBuildStages(repoList)
+            println("Initialised pipeline.")
         }
         parallel(buildStages)
         stage ("scan") {
