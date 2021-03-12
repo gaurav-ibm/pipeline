@@ -53,11 +53,9 @@ pipeline {
 }
 
 def buildAllServices(repoList) {
-    script {
-        for(int i=0; i < repoList.size(); i++) {
-            stage("Building ${list[i]}"){
-                echo "Element: $i"
-            }
+    for(int i=0; i < repoList.size(); i++) {
+        stage("Building ${list[i]}"){
+            echo "Element: $i"
         }
     }
 }
