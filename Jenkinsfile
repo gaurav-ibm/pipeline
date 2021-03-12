@@ -1,4 +1,5 @@
 def repoList = 'undefined'
+def baseGitURL = 'https://github.com/gaurav-ibm/'
 pipeline {
     agent any
     tools {
@@ -11,15 +12,17 @@ pipeline {
         string(name: 'REPO_LIST', defaultValue: 'repoList.csv', description: 'Name of CSV file containing the list of modules comprising this application, one per line', trim: true)
     }
     stages {
-        stage ("build") {
+        stage ("scan CSV") {
             steps{
                 echo "inside build stage"
                 script {
                     repoList = readTrusted(params.REPO_LIST).readLines()
-                    for (repo in repoList) {
-                        echo "working on repo: ${repo}"
-                    }
                 }
+            }
+        }
+        stage ("bundle deployable jars") {
+            steps {
+                buildAllServices(repoList)
             }
         }
         stage ("scan") {
@@ -44,6 +47,16 @@ pipeline {
         changed {
             echo 'This will run only if the state of the Pipeline has changed'
             echo 'For example, if the Pipeline was previously failing but is now successful'
+        }
+    }
+}
+
+def buildAllServices(repoList) {
+    script {
+        for(int i=0; i < repoList.size(); i++) {
+            stage("Building ${list[i]}"){
+                echo "Element: $i"
+            }
         }
     }
 }
