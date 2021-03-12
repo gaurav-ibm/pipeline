@@ -23,6 +23,7 @@ pipeline {
         }
         stage ("bundle deployable jars") {
             steps {
+                echo "about to call build loop"
                 buildAllServices(repoList)
             }
         }
