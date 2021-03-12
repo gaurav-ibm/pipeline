@@ -18,15 +18,11 @@ pipeline {
                 script {
                     repoList = readTrusted(params.REPO_LIST).readLines()
                 }
-                echo "${repoList}"
+                buildStages = prepareBuildStages(repoList)
+                println("Initialised pipeline.")
             }
         }
-        stage ("bundle deployable jars") {
-            steps {
-                echo "about to call build loop"
-                buildAllServices(repoList)
-            }
-        }
+        parallel(buildStages)
         stage ("scan") {
             steps {
                 echo "inside scan stage"
@@ -53,10 +49,21 @@ pipeline {
     }
 }
 
-def buildAllServices(repoList) {
-    for(int i=0; i < repoList.size(); i++) {
-        stage("Building ${list[i]}"){
-            echo "Element: $i"
-        }
+// Create List of build stages to suit
+def prepareBuildStages(List repoList) {
+    def buildParallelMap = [:]
+    for (name in repoList ) {
+        def n = "${name}"
+        buildParallelMap.put(n, prepareOneBuildStage(n))
     }
+    return buildParallelMap
+}
+
+def prepareOneBuildStage(String name) {
+  return {
+    stage("Build stage: ${name}") {
+      println("Building ${name}")
+      sh(script:'sleep 5', returnStatus:true)
+    }
+  }
 }
