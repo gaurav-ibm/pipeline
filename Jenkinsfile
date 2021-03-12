@@ -14,15 +14,15 @@ pipeline {
         string(name: 'REPO_LIST', defaultValue: 'repoList.csv', description: 'Name of CSV file containing the list of modules comprising this application, one per line', trim: true)
     }
     stages {
-        stage ("scan CSV") {
+        stage ("read CSV") {
             steps{
                 echo "reading CSV file"
                 script {
                     repoList = readTrusted(params.REPO_LIST).readLines()
                 }
+                buildStages = prepareBuildStages(repoList)
+                println("Initialised pipeline.")
             }
-            buildStages = prepareBuildStages(repoList)
-            println("Initialised pipeline.")
         }
         parallel(buildStages)
         stage ("scan") {
