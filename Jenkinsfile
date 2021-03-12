@@ -14,10 +14,11 @@ pipeline {
     stages {
         stage ("scan CSV") {
             steps{
-                echo "inside build stage"
+                echo "inside reading CSV stage"
                 script {
                     repoList = readTrusted(params.REPO_LIST).readLines()
                 }
+                echo "${repoList}"
             }
         }
         stage ("bundle deployable jars") {
