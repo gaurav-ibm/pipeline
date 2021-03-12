@@ -1,16 +1,40 @@
+def repoList = 'undefined'
 pipeline {
     agent any
-    parameters { 
-       choice(name: 'REPO_LIST', choices: ['box1', 'box2'], description: 'list of names of repositories in github to be build and zipped for veracode scan')
-    }
     tools {
-        maven "Maven"
-        gradle "Gradle"
+        maven 'Maven'
+        gradle 'Gradle'
     }
     stages {
+        stage ("setup parameters") {
+            script {
+                properties ([
+                    parameters ([
+                        string(
+                            defaultValue: 'ODS (Operational Data Store)', 
+                            name: 'APP_NAME', 
+                            trim: true,
+                            description: 'Name of Application'
+                            ),
+                        string(
+                            defaultValue: 'MS', 
+                            name: 'APP_TYPE', 
+                            trim: true,
+                            description: 'type of application, MS stands for microservices'
+                            ),
+                        string(
+                            defaultValue: 'repoList.csv',
+                            name: 'FILE_NAME',
+                            trim: true,
+                            description: 'Name of CSV file containing the list of modules comprising this application, one per line'
+                        )
+                    ])
+                ])
+            }
+        }
         stage ("build") {
             echo "inside build stage"
-            def repoList = param.REPO_LIST.split('\n');
+            repoList = readFile(param.FILE_NAME)
             for (repo in repoList) {
                 echo "working on repo: ${repo}"
             }
