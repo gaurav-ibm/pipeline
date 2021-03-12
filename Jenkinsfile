@@ -14,9 +14,11 @@ pipeline {
         stage ("build") {
             steps{
                 echo "inside build stage"
-                repoList = readTrusted(param.REPO_LIST)
-                for (repo in repoList) {
-                    echo "working on repo: ${repo}"
+                script {
+                    repoList = readTrusted(param.REPO_LIST)
+                    for (repo in repoList) {
+                        echo "working on repo: ${repo}"
+                    }
                 }
             }
         }
