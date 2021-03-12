@@ -5,36 +5,15 @@ pipeline {
         maven 'Maven'
         gradle 'Gradle'
     }
+    parameters {
+        string(name: 'APP_NAME', defaultValue: 'ODS (Operational Data Store)', description: 'Name of application', trim: true)
+        string(name: 'APP_TYPE', defaultValue: 'MS', description: 'type of application, MS stands for microservices', trim: true)
+        string(name: 'REPO_LIST', defaultValue: 'repoList.csv', description: 'Name of CSV file containing the list of modules comprising this application, one per line', trim: true)
+    }
     stages {
-        stage ("setup parameters") {
-            script {
-                properties ([
-                    parameters ([
-                        string(
-                            defaultValue: 'ODS (Operational Data Store)', 
-                            name: 'APP_NAME', 
-                            trim: true,
-                            description: 'Name of Application'
-                            ),
-                        string(
-                            defaultValue: 'MS', 
-                            name: 'APP_TYPE', 
-                            trim: true,
-                            description: 'type of application, MS stands for microservices'
-                            ),
-                        string(
-                            defaultValue: 'repoList.csv',
-                            name: 'FILE_NAME',
-                            trim: true,
-                            description: 'Name of CSV file containing the list of modules comprising this application, one per line'
-                        )
-                    ])
-                ])
-            }
-        }
         stage ("build") {
             echo "inside build stage"
-            repoList = readFile(param.FILE_NAME)
+            repoList = readTrusted(param.REPO_LIST)
             for (repo in repoList) {
                 echo "working on repo: ${repo}"
             }
