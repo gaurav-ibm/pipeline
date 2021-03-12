@@ -12,14 +12,18 @@ pipeline {
     }
     stages {
         stage ("build") {
-            echo "inside build stage"
-            repoList = readTrusted(param.REPO_LIST)
-            for (repo in repoList) {
-                echo "working on repo: ${repo}"
+            steps{
+                echo "inside build stage"
+                repoList = readTrusted(param.REPO_LIST)
+                for (repo in repoList) {
+                    echo "working on repo: ${repo}"
+                }
             }
         }
         stage ("scan") {
-            echo "inside scan stage"
+            steps {
+                echo "inside scan stage"
+            }
         }
     }
     post {
