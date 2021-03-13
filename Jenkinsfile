@@ -24,9 +24,15 @@ pipeline {
                 }
             }
         }
-        stage ("build microservices") {
-            parallel(buildStages)
-        }
+
+        parallel(buildStages)
+        /*stage ("build microservices") {
+            steps {
+                script {
+                    buildStages.each{bs -> parallel(bs)} 
+                }
+            }
+        }*/
         stage ("scan") {
             steps {
                 echo "inside scan stage"
