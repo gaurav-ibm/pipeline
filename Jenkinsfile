@@ -25,11 +25,7 @@ pipeline {
             }
         }
         stage ("build microservices") {
-            steps {
-                script {
-                    buildStages.each{bs -> parallel(bs)} 
-                }
-            }
+            parallel(buildStages)
         }
         stage ("scan") {
             steps {
