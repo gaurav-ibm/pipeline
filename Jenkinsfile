@@ -20,7 +20,7 @@ pipeline {
                     echo "reading CSV file"
                     repoList = readTrusted(params.REPO_LIST).readLines()
                     buildStages = prepareBuildStages(repoList)
-                    println("Initialised pipeline.")
+                    println("Initialised pipeline. ${buildStages}")
                 }
             }
         }
