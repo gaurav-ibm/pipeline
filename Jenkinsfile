@@ -27,7 +27,7 @@ pipeline {
         stage ("build microservices") {
             steps {
                 script {
-                    parallel parallelStagesMap 
+                    parallel buildStages 
                 }
             }
         }
