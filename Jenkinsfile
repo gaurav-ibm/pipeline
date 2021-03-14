@@ -115,12 +115,12 @@ def checkoutCode(String microserviceName) {
         doGenerateSubmoduleConfigurations: false, 
         extensions: [[
             $class: 'RelativeTargetDirectory', 
-            relativeTargetDir: "microservices/${name}"
+            relativeTargetDir: "microservices/${microserviceName}"
         ]], 
         submoduleCfg: [], 
         userRemoteConfigs: [[
             credentialsId: "github_credentials", 
-            url: "https://github.com/gaurav-ibm/${name}.git"
+            url: "https://github.com/gaurav-ibm/${microserviceName}.git"
         ]]
     ])
 }
