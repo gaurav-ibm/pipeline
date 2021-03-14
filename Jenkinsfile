@@ -21,6 +21,7 @@ pipeline {
                     buildStages = prepareBuildStages(repoList)
                     echo "${WORKSPACE}"
                     globalWS = WORKSPACE
+                    bat "mkdir resultingJars"
                 }
             }
         }
@@ -81,6 +82,7 @@ def prepareMavenBuildStage(String name) {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             //checkoutCode(name)
             def jobFolder = JOB_NAME.replace("/", "_")
+            def targetFolder = "${WORKSPACE}\\..\\..\\workspace\\${jobFolder}\\resultingJars"
             ws("microservices/${name}") {
                 checkout([
                     $class: 'GitSCM', 
@@ -99,9 +101,8 @@ def prepareMavenBuildStage(String name) {
                 bat 'mvn -B -DskipTests clean package'
                 bat "dir target\\*.jar"
                 println("Inside maven build stage. WS: ${WORKSPACE}")
-                println("This is running under job: ${JOB_NAME}")
-                println("Base Job Name: ${JOB_BASE_NAME}")
-                bat "dir ${WORKSPACE}\\..\\..\\${jobFolder}"
+                bat "copy target\\*.jar ${targetFolder}"
+                bat "dir ${targetFolder}"
             }
             println("Built ${name} using maven}")
         }
@@ -115,6 +116,7 @@ def prepareGradleBuildStage(String name) {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             //checkoutCode(name)
             def jobFolder = JOB_NAME.replace("/", "_")
+            def targetFolder = "${WORKSPACE}\\..\\..\\workspace\\${jobFolder}\\resultingJars"
             ws("microservices/${name}") {
                 checkout([
                     $class: 'GitSCM', 
@@ -134,10 +136,8 @@ def prepareGradleBuildStage(String name) {
                 bat "gradle --no-daemon clean build -x test"
                 bat "dir build\\libs\\*.jar"
                 println("Inside gradle build stage. WS: ${WORKSPACE}")
-                println("This is running under job: ${JOB_NAME}")
-
-                println("Base Job Name: ${JOB_BASE_NAME}")
-                bat "dir ${WORKSPACE}\\..\\..\\workspace\\${jobFolder}"
+                bat "copy build\\libs\\*.jar ${targetFolder}"
+                bat "dir ${targetFolder}"
             }
             println("Built ${name} using gradle")
         }
