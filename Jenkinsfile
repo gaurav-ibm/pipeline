@@ -94,10 +94,8 @@ def prepareMavenBuildStage(String name) {
                     url: "https://github.com/gaurav-ibm/${name}.git"
                 ]]
             ])
-            dir("microservices/${name}") {
-                step {
-                   //sh 'mvn -B -DskipTests clean package' 
-                }
+            ws("microservices/${name}") {
+                sh 'mvn -B -DskipTests clean package'
             }
             println("Building ${name} using ${buildTool}")
         }
@@ -124,11 +122,9 @@ def prepareGradleBuildStage(String name) {
                     url: "https://github.com/gaurav-ibm/${name}.git"
                 ]]
             ])
-            dir("microservices/${name}") {
-                step {
-                    //sh "chmod +x gradlew"
-                    //sh "BUILD_PROFILE=DEV ./gradlew --no-daemon clean build -x test"
-                }
+            ws("microservices/${name}") {
+                sh "chmod +x gradlew"
+                sh "BUILD_PROFILE=DEV ./gradlew --no-daemon clean build -x test"
             }
             println("Building ${name} using ${buildTool}")
         }
