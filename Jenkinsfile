@@ -1,6 +1,7 @@
 def repoList = 'undefined'
 def baseGitURL = 'https://github.com/gaurav-ibm/'
-def buildStages
+def buildStages = [:]
+def parallelStagesMap = [:]
 
 pipeline {
     agent any
@@ -20,12 +21,14 @@ pipeline {
                     echo "reading CSV file"
                     repoList = readTrusted(params.REPO_LIST).readLines()
                     buildStages = prepareBuildStages(repoList)
+                    parallelStagesMap = repoList.collectEntried {
+                        ["${it}" : generateStage(it)]
+                    }
                     println("Initialised pipeline. ${buildStages}")
                 }
             }
         }
 
-        parallel(buildStages)
         /*stage ("build microservices") {
             steps {
                 script {
@@ -76,4 +79,13 @@ def prepareOneBuildStage(String name) {
       sh(script:'sleep 5', returnStatus:true)
     }
   }
+}
+
+def generateStage(job) {
+    return {
+        stage("stage: ${job}") {
+                echo "This is ${job}."
+                sh(script:'sleep 5', returnStatus:true)
+        }
+    }
 }
