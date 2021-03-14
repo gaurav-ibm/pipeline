@@ -63,7 +63,7 @@ def prepareBuildStages(List repoList) {
     def buildParallelMap = [:]
     for (line in repoList ) {
         def elements = line.split(',')
-        def name = "${elements[0]}"
+        def name = elements[0]
         def buildTool = elements[1]
         if (buildTool.contains('maven')) {
             buildParallelMap.put(name, prepareMavenBuildStage(name))
@@ -79,7 +79,21 @@ def prepareMavenBuildStage(String name) {
   return {
     stage("Build stage: ${name}") {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            checkoutCode(name)
+            //checkoutCode(name)
+            checkout([
+                $class: 'GitSCM', 
+                branches: [[name: "*/main"]], 
+                doGenerateSubmoduleConfigurations: false, 
+                extensions: [[
+                    $class: 'RelativeTargetDirectory', 
+                    relativeTargetDir: "microservices/${name}"
+                ]], 
+                submoduleCfg: [], 
+                userRemoteConfigs: [[
+                    credentialsId: "github_credentials", 
+                    url: "https://github.com/gaurav-ibm/${name}.git"
+                ]]
+            ])
             dir("microservices/${name}") {
                 step {
                    sh 'mvn -B -DskipTests clean package' 
@@ -95,7 +109,21 @@ def prepareGradleBuildStage(String name) {
   return {
     stage("Build stage: ${name}") {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            checkoutCode(name)
+            //checkoutCode(name)
+            checkout([
+                $class: 'GitSCM', 
+                branches: [[name: "*/main"]], 
+                doGenerateSubmoduleConfigurations: false, 
+                extensions: [[
+                    $class: 'RelativeTargetDirectory', 
+                    relativeTargetDir: "microservices/${name}"
+                ]], 
+                submoduleCfg: [], 
+                userRemoteConfigs: [[
+                    credentialsId: "github_credentials", 
+                    url: "https://github.com/gaurav-ibm/${name}.git"
+                ]]
+            ])
             dir("microservices/${name}") {
                 step {
                     sh "chmod +x gradlew"
