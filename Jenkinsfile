@@ -10,7 +10,7 @@ pipeline {
     }
     parameters {
         string(name: 'APP_NAME', defaultValue: 'ODS (Operational Data Store)', description: 'Name of application', trim: true)
-        string(name: 'APP_TYPE', defaultValue: 'MS', description: 'type of application, MS stands for microservices', trim: true)
+        //string(name: 'APP_TYPE', defaultValue: 'MS', description: 'type of application, MS stands for microservices', trim: true)
         string(name: 'REPO_LIST', defaultValue: 'repoList.csv', description: 'Name of CSV file containing the list of modules comprising this application, one per line', trim: true)
     }
     stages {
@@ -63,7 +63,7 @@ def prepareBuildStages(List repoList) {
     for (line in repoList ) {
         def elements = line.split(',')
         def name = "${elements[0]}"
-        def buildTool = element[1]
+        def buildTool = elements[1]
         buildParallelMap.put(name, prepareOneBuildStage(name, buildTool))
     }
     return buildParallelMap
