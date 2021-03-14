@@ -80,6 +80,7 @@ def prepareMavenBuildStage(String name) {
     stage("Build : ${name}") {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             //checkoutCode(name)
+            def jobFolder = JOB_NAME.replace("\\", "_")
             ws("microservices/${name}") {
                 checkout([
                     $class: 'GitSCM', 
@@ -100,7 +101,7 @@ def prepareMavenBuildStage(String name) {
                 println("Inside maven build stage. WS: ${WORKSPACE}")
                 println("This is running under job: ${JOB_NAME}")
                 println("Base Job Name: ${JOB_BASE_NAME}")
-                bat "dir ${WORKSPACE}\\..\\.."
+                bat "dir ${WORKSPACE}\\..\\..\\${jobFolder}"
             }
             println("Built ${name} using maven}")
         }
@@ -113,6 +114,7 @@ def prepareGradleBuildStage(String name) {
     stage("Build : ${name}") {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             //checkoutCode(name)
+            def jobFolder = JOB_NAME.replace("\\", "_")
             ws("microservices/${name}") {
                 checkout([
                     $class: 'GitSCM', 
@@ -133,8 +135,9 @@ def prepareGradleBuildStage(String name) {
                 bat "dir build\\libs\\*.jar"
                 println("Inside gradle build stage. WS: ${WORKSPACE}")
                 println("This is running under job: ${JOB_NAME}")
+
                 println("Base Job Name: ${JOB_BASE_NAME}")
-                bat "dir ${WORKSPACE}\\..\\.."
+                bat "dir ${WORKSPACE}\\..\\..\\workspace\\${jobFolder}"
             }
             println("Built ${name} using gradle")
         }
