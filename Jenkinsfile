@@ -77,7 +77,7 @@ def prepareOneBuildStage(String name, String buildTool) {
         catchError(buildResult: 'SUCCESS') {
             checkout([
                 $class: 'GitSCM', 
-                branches: [[name: "*/${scmBranch}"]], 
+                branches: [[name: "*/main"]], 
                 doGenerateSubmoduleConfigurations: false, 
                 extensions: [[
                     $class: 'RelativeTargetDirectory', 
