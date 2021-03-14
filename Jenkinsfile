@@ -80,22 +80,22 @@ def prepareMavenBuildStage(String name) {
     stage("Build : ${name}") {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             //checkoutCode(name)
-            checkout([
-                $class: 'GitSCM', 
-                branches: [[name: "*/main"]], 
-                doGenerateSubmoduleConfigurations: false, 
-                extensions: [[
-                    $class: 'RelativeTargetDirectory', 
-                    relativeTargetDir: "microservices/${name}"
-                ]], 
-                submoduleCfg: [], 
-                userRemoteConfigs: [[
-                    credentialsId: "github_credentials", 
-                    url: "https://github.com/gaurav-ibm/${name}.git"
-                ]]
-            ])
             ws("microservices/${name}") {
-                sh 'mvn -B -DskipTests clean package'
+                checkout([
+                    $class: 'GitSCM', 
+                    branches: [[name: "*/main"]], 
+                    doGenerateSubmoduleConfigurations: false, 
+                    extensions: [[
+                        $class: 'RelativeTargetDirectory', 
+                        relativeTargetDir: ""
+                    ]], 
+                    submoduleCfg: [], 
+                    userRemoteConfigs: [[
+                        credentialsId: "github_credentials", 
+                        url: "https://github.com/gaurav-ibm/${name}.git"
+                    ]]
+                ])
+                bat 'mvn -B -DskipTests clean package'
             }
             println("Building ${name} using ${buildTool}")
         }
@@ -108,23 +108,23 @@ def prepareGradleBuildStage(String name) {
     stage("Build stage: ${name}") {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             //checkoutCode(name)
-            checkout([
-                $class: 'GitSCM', 
-                branches: [[name: "*/main"]], 
-                doGenerateSubmoduleConfigurations: false, 
-                extensions: [[
-                    $class: 'RelativeTargetDirectory', 
-                    relativeTargetDir: "microservices/${name}"
-                ]], 
-                submoduleCfg: [], 
-                userRemoteConfigs: [[
-                    credentialsId: "github_credentials", 
-                    url: "https://github.com/gaurav-ibm/${name}.git"
-                ]]
-            ])
             ws("microservices/${name}") {
-                sh "chmod +x gradlew"
-                sh "BUILD_PROFILE=DEV ./gradlew --no-daemon clean build -x test"
+                checkout([
+                    $class: 'GitSCM', 
+                    branches: [[name: "*/main"]], 
+                    doGenerateSubmoduleConfigurations: false, 
+                    extensions: [[
+                        $class: 'RelativeTargetDirectory', 
+                        relativeTargetDir: ""
+                    ]], 
+                    submoduleCfg: [], 
+                    userRemoteConfigs: [[
+                        credentialsId: "github_credentials", 
+                        url: "https://github.com/gaurav-ibm/${name}.git"
+                    ]]
+                ])
+                //sh "chmod +x gradlew"
+                bat "gradle --no-daemon clean build -x test"
             }
             println("Building ${name} using ${buildTool}")
         }
