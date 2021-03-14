@@ -98,8 +98,9 @@ def prepareMavenBuildStage(String name) {
                 bat 'mvn -B -DskipTests clean package'
                 bat "dir target\\*.jar"
                 println("Inside maven build stage. WS: ${WORKSPACE}")
-                println("Trying to access global WS. GWS: ${globalWS}")
-                bat "dir ${globalWS}"
+                println("This is running under job: ${JOB_NAME}")
+                println("Base Job Name: ${JOB_BASE_NAME}")
+                bat "dir ${WORKSPACE}\\..\\.."
             }
             println("Built ${name} using maven}")
         }
@@ -131,8 +132,9 @@ def prepareGradleBuildStage(String name) {
                 bat "gradle --no-daemon clean build -x test"
                 bat "dir build\\libs\\*.jar"
                 println("Inside gradle build stage. WS: ${WORKSPACE}")
-                println("Trying to access global WS. GWS: ${globalWS}")
-                bat "dir ${globalWS}"
+                println("This is running under job: ${JOB_NAME}")
+                println("Base Job Name: ${JOB_BASE_NAME}")
+                bat "dir ${WORKSPACE}\\..\\.."
             }
             println("Built ${name} using gradle")
         }
