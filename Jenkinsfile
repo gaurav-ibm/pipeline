@@ -1,7 +1,6 @@
 def repoList = 'undefined'
 def baseGitURL = 'https://github.com/gaurav-ibm/'
 def buildStages = [:]
-def parallelStagesMap = [:]
 
 pipeline {
     agent any
@@ -21,10 +20,6 @@ pipeline {
                     echo "reading CSV file"
                     repoList = readTrusted(params.REPO_LIST).readLines()
                     buildStages = prepareBuildStages(repoList)
-                    parallelStagesMap = repoList.collectEntries {
-                        ["${it}" : generateStage(it)]
-                    }
-                    println("Initialised pipeline. ${buildStages}")
                 }
             }
         }
@@ -65,26 +60,19 @@ pipeline {
 // Create List of build stages to suit
 def prepareBuildStages(List repoList) {
     def buildParallelMap = [:]
-    for (name in repoList ) {
-        def n = "${name}"
-        buildParallelMap.put(n, prepareOneBuildStage(n))
+    for (line in repoList ) {
+        def elements = line.split(',')
+        def name = "${elements[0]}"
+        def buildTool = element[1]
+        buildParallelMap.put(name, prepareOneBuildStage(name, buildTool))
     }
     return buildParallelMap
 }
 
-def prepareOneBuildStage(String name) {
+def prepareOneBuildStage(String name, String buildTool) {
   return {
     stage("Build stage: ${name}") {
-      println("Building ${name}")
-      sh(script:'sleep 5', returnStatus:true)
+        println("Building ${name} using ${buildTool}")
     }
   }
-}
-
-def generateStage(job) {
-    return {
-        stage("stage: ${job}") {
-                echo "This is ${job}."
-        }
-    }
 }
