@@ -21,7 +21,7 @@ pipeline {
                     echo "reading CSV file"
                     repoList = readTrusted(params.REPO_LIST).readLines()
                     buildStages = prepareBuildStages(repoList)
-                    parallelStagesMap = repoList.collectEntried {
+                    parallelStagesMap = repoList.collectEntries {
                         ["${it}" : generateStage(it)]
                     }
                     println("Initialised pipeline. ${buildStages}")
@@ -29,13 +29,13 @@ pipeline {
             }
         }
 
-        /*stage ("build microservices") {
+        stage ("build microservices") {
             steps {
                 script {
-                    buildStages.each{bs -> parallel(bs)} 
+                    parallel parallelStagesMap 
                 }
             }
-        }*/
+        }
         stage ("scan") {
             steps {
                 echo "inside scan stage"
@@ -85,7 +85,6 @@ def generateStage(job) {
     return {
         stage("stage: ${job}") {
                 echo "This is ${job}."
-                sh(script:'sleep 5', returnStatus:true)
         }
     }
 }
