@@ -19,8 +19,6 @@ pipeline {
                     echo "reading CSV file"
                     repoList = readTrusted(params.REPO_LIST).readLines()
                     buildStages = prepareBuildStages(repoList)
-                    echo "${WORKSPACE}"
-                    globalWS = WORKSPACE
                     bat "mkdir resultingJars"
                 }
             }
@@ -36,6 +34,9 @@ pipeline {
         stage ("scan") {
             steps {
                 echo "inside scan stage"
+                zip zipFile: 'ODS.zip', archive: true, dir: 'resultingJars'
+                archiveArtifacts artifacts: 'ODS.zip', fingerprint: true
+                bat "dir ${WORKSPACE}\\*.zip"
             }
         }
     }
@@ -104,7 +105,7 @@ def prepareMavenBuildStage(String name) {
                 bat "copy target\\*.jar ${targetFolder}"
                 bat "dir ${targetFolder}"
             }
-            println("Built ${name} using maven}")
+            println("Built ${name} using maven")
         }
     }
   }
