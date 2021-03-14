@@ -1,8 +1,6 @@
 def repoList = 'undefined'
-def scmURL = 'https://github.com/gaurav-ibm/'
-def scmBranch = 'main'
-def scmCredentialsId = 'github_credentials'
 def buildStages = [:]
+def globalWS = ''
 
 pipeline {
     agent any
@@ -21,6 +19,8 @@ pipeline {
                     echo "reading CSV file"
                     repoList = readTrusted(params.REPO_LIST).readLines()
                     buildStages = prepareBuildStages(repoList)
+                    echo "${WORKSPACE}"
+                    globalWS = WORKSPACE
                 }
             }
         }
@@ -97,6 +97,9 @@ def prepareMavenBuildStage(String name) {
                 ])
                 bat 'mvn -B -DskipTests clean package'
                 bat "dir target\\*.jar"
+                println("Inside maven build stage. WS: ${WORKSPACE}")
+                println("Trying to access global WS. GWS: ${globalWS}")
+                bat "dir ${globalWS}"
             }
             println("Built ${name} using maven}")
         }
@@ -106,7 +109,7 @@ def prepareMavenBuildStage(String name) {
 
 def prepareGradleBuildStage(String name) {
   return {
-    stage("Build stage: ${name}") {
+    stage("Build : ${name}") {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             //checkoutCode(name)
             ws("microservices/${name}") {
@@ -127,6 +130,9 @@ def prepareGradleBuildStage(String name) {
                 //sh "chmod +x gradlew"
                 bat "gradle --no-daemon clean build -x test"
                 bat "dir build\\libs\\*.jar"
+                println("Inside gradle build stage. WS: ${WORKSPACE}")
+                println("Trying to access global WS. GWS: ${globalWS}")
+                bat "dir ${globalWS}"
             }
             println("Built ${name} using gradle")
         }
