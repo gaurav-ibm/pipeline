@@ -96,7 +96,7 @@ def prepareMavenBuildStage(String name) {
                     ]]
                 ])
                 bat 'mvn -B -DskipTests clean package'
-                bat 'dir target\*.jar'
+                bat "dir target\\*.jar"
             }
             println("Built ${name} using maven}")
         }
@@ -126,7 +126,7 @@ def prepareGradleBuildStage(String name) {
                 ])
                 //sh "chmod +x gradlew"
                 bat "gradle --no-daemon clean build -x test"
-                bat "dir build\libs\*.jar"
+                bat "dir build\\libs\\*.jar"
             }
             println("Built ${name} using gradle")
         }
