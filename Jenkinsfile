@@ -74,7 +74,7 @@ def prepareBuildStages(List repoList) {
 def prepareOneBuildStage(String name, String buildTool) {
   return {
     stage("Build stage: ${name}") {
-        catchError(buildResult: 'SUCCESS') {
+        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             checkout([
                 $class: 'GitSCM', 
                 branches: [[name: "*/main"]], 
@@ -88,7 +88,12 @@ def prepareOneBuildStage(String name, String buildTool) {
                     credentialsId: "github_credentials", 
                     url: "https://github.com/gaurav-ibm/${name}.git"
                     ]]
-            ]) 
+            ])
+            dir("microservices/${name}") {
+                steps {
+                   sh 'mvn -B -DskipTests clean package' 
+                }
+            }
             println("Building ${name} using ${buildTool}")
         }
     }
