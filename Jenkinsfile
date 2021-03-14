@@ -77,7 +77,7 @@ def prepareBuildStages(List repoList) {
 
 def prepareMavenBuildStage(String name) {
   return {
-    stage("Build stage: ${name}") {
+    stage("Build : ${name}") {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             //checkoutCode(name)
             checkout([
@@ -96,7 +96,7 @@ def prepareMavenBuildStage(String name) {
             ])
             dir("microservices/${name}") {
                 step {
-                   sh 'mvn -B -DskipTests clean package' 
+                   //sh 'mvn -B -DskipTests clean package' 
                 }
             }
             println("Building ${name} using ${buildTool}")
@@ -126,8 +126,8 @@ def prepareGradleBuildStage(String name) {
             ])
             dir("microservices/${name}") {
                 step {
-                    sh "chmod +x gradlew"
-                    sh "BUILD_PROFILE=DEV ./gradlew --no-daemon clean build -x test"
+                    //sh "chmod +x gradlew"
+                    //sh "BUILD_PROFILE=DEV ./gradlew --no-daemon clean build -x test"
                 }
             }
             println("Building ${name} using ${buildTool}")
