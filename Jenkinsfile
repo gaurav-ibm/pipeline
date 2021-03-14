@@ -80,7 +80,7 @@ def prepareMavenBuildStage(String name) {
     stage("Build : ${name}") {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             //checkoutCode(name)
-            def jobFolder = JOB_NAME.replace("\\", "_")
+            def jobFolder = JOB_NAME.replace("/", "_")
             ws("microservices/${name}") {
                 checkout([
                     $class: 'GitSCM', 
@@ -114,7 +114,7 @@ def prepareGradleBuildStage(String name) {
     stage("Build : ${name}") {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
             //checkoutCode(name)
-            def jobFolder = JOB_NAME.replace("\\", "_")
+            def jobFolder = JOB_NAME.replace("/", "_")
             ws("microservices/${name}") {
                 checkout([
                     $class: 'GitSCM', 
