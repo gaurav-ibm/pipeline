@@ -12,7 +12,6 @@ pipeline {
     }
     parameters {
         string(name: 'APP_NAME', defaultValue: 'ODS (Operational Data Store)', description: 'Name of application', trim: true)
-        //string(name: 'APP_TYPE', defaultValue: 'MS', description: 'type of application, MS stands for microservices', trim: true)
         string(name: 'REPO_LIST', defaultValue: 'repoList.csv', description: 'Name of CSV file containing the list of modules comprising this application, one per line', trim: true)
     }
     stages {
@@ -66,31 +65,23 @@ def prepareBuildStages(List repoList) {
         def elements = line.split(',')
         def name = "${elements[0]}"
         def buildTool = elements[1]
-        buildParallelMap.put(name, prepareOneBuildStage(name, buildTool))
+        if (buildTool.contains('maven')) {
+            buildParallelMap.put(name, prepareMavenBuildStage(name))
+        }
+        if (buildTool.contains('gradle')) {
+            buildParallelMap.put(name, prepareGradleBuildStage(name))
+        }
     }
     return buildParallelMap
 }
 
-def prepareOneBuildStage(String name, String buildTool) {
+def prepareMavenBuildStage(String name) {
   return {
     stage("Build stage: ${name}") {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            checkout([
-                $class: 'GitSCM', 
-                branches: [[name: "*/main"]], 
-                doGenerateSubmoduleConfigurations: false, 
-                extensions: [[
-                    $class: 'RelativeTargetDirectory', 
-                    relativeTargetDir: "microservices/${name}"
-                ]], 
-                submoduleCfg: [], 
-                userRemoteConfigs: [[
-                    credentialsId: "github_credentials", 
-                    url: "https://github.com/gaurav-ibm/${name}.git"
-                    ]]
-            ])
+            checkoutCode(name)
             dir("microservices/${name}") {
-                steps {
+                step {
                    sh 'mvn -B -DskipTests clean package' 
                 }
             }
@@ -98,4 +89,38 @@ def prepareOneBuildStage(String name, String buildTool) {
         }
     }
   }
+}
+
+def prepareGradleBuildStage(String name) {
+  return {
+    stage("Build stage: ${name}") {
+        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            checkoutCode(name)
+            dir("microservices/${name}") {
+                step {
+                    sh "chmod +x gradlew"
+                    sh "BUILD_PROFILE=DEV ./gradlew --no-daemon clean build -x test"
+                }
+            }
+            println("Building ${name} using ${buildTool}")
+        }
+    }
+  }
+}
+
+def checkoutCode(String microserviceName) {
+    checkout([
+        $class: 'GitSCM', 
+        branches: [[name: "*/main"]], 
+        doGenerateSubmoduleConfigurations: false, 
+        extensions: [[
+            $class: 'RelativeTargetDirectory', 
+            relativeTargetDir: "microservices/${name}"
+        ]], 
+        submoduleCfg: [], 
+        userRemoteConfigs: [[
+            credentialsId: "github_credentials", 
+            url: "https://github.com/gaurav-ibm/${name}.git"
+        ]]
+    ])
 }
