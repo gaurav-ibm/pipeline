@@ -81,12 +81,12 @@ def prepareOneBuildStage(String name, String buildTool) {
                 doGenerateSubmoduleConfigurations: false, 
                 extensions: [[
                     $class: 'RelativeTargetDirectory', 
-                    relativeTargetDir: 'microservices'
+                    relativeTargetDir: "microservices/${name}"
                 ]], 
                 submoduleCfg: [], 
                 userRemoteConfigs: [[
-                    credentialsId: "${scmCredentialsId}", 
-                    url: "${scmURL}${name}.git"
+                    credentialsId: "github_credentials", 
+                    url: "https://github.com/gaurav-ibm/${name}.git"
                     ]]
             ]) 
             println("Building ${name} using ${buildTool}")
