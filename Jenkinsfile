@@ -72,7 +72,7 @@ def prepareBuildStages(List repoList) {
 def prepareOneBuildStage(String name, String buildTool) {
   return {
     stage("Build stage: ${name}") {
-        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+        catchError(buildResult: 'SUCCESS') {
             println("Building ${name} using ${buildTool}")
         }
     }
