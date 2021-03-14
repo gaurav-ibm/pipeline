@@ -1,5 +1,7 @@
 def repoList = 'undefined'
-def baseGitURL = 'https://github.com/gaurav-ibm/'
+def scmURL = 'https://github.com/gaurav-ibm/'
+def scmBranch = 'main'
+def scmCredentialsId = 'github_credentials'
 def buildStages = [:]
 
 pipeline {
@@ -73,6 +75,20 @@ def prepareOneBuildStage(String name, String buildTool) {
   return {
     stage("Build stage: ${name}") {
         catchError(buildResult: 'SUCCESS') {
+            checkout([
+                $class: 'GitSCM', 
+                branches: [[name: "*/${scmBranch}"]], 
+                doGenerateSubmoduleConfigurations: false, 
+                extensions: [[
+                    $class: 'RelativeTargetDirectory', 
+                    relativeTargetDir: 'microservices'
+                ]], 
+                submoduleCfg: [], 
+                userRemoteConfigs: [[
+                    credentialsId: "${scmCredentialsId}", 
+                    url: "${scmURL}${name}.git"
+                    ]]
+            ]) 
             println("Building ${name} using ${buildTool}")
         }
     }
